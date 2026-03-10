@@ -1,0 +1,90 @@
+# DQN Configuration for Smart Energy Grid Optimization
+# Author: Pranay M Mahendrakar
+
+# ─────────────────────────────────────────────
+# Environment Settings
+# ─────────────────────────────────────────────
+environment:
+  n_nodes: 14          # Number of grid nodes (IEEE 14-bus standard)
+  n_lines: 20          # Number of transmission lines
+  n_storage: 3         # Number of battery storage units
+  max_steps: 168       # Episode length (hours = 1 week at hourly resolution)
+
+# ─────────────────────────────────────────────
+# DQN Agent Hyperparameters
+# ─────────────────────────────────────────────
+agent:
+  # Action space discretization
+  action_bins: 10       # Number of discrete action buckets
+
+  # Network architecture
+  hidden_dims: [256, 256, 128]
+
+  # Learning
+  learning_rate: 0.0001
+  gamma: 0.99           # Discount factor
+
+  # Exploration
+  epsilon_start: 1.0
+  epsilon_end: 0.05
+  epsilon_decay: 50000  # Steps for epsilon to decay
+
+  # Replay buffer
+  buffer_capacity: 100000
+  batch_size: 256
+
+  # Target network
+  target_update_freq: 1000  # Steps between target network hard updates
+
+# ─────────────────────────────────────────────
+# Training Settings
+# ─────────────────────────────────────────────
+training:
+  n_episodes: 1000
+  warmup_steps: 5000    # Random exploration before training starts
+  max_grad_norm: 10.0   # Gradient clipping threshold
+
+  # Checkpointing
+  checkpoint_dir: checkpoints/dqn
+  save_interval: 500    # Save checkpoint every N episodes
+
+  # Evaluation
+  eval_interval: 200    # Evaluate every N episodes
+  eval_episodes: 10     # Number of episodes per evaluation
+
+  # Logging
+  log_interval: 50      # Log metrics every N episodes
+  use_wandb: false      # Enable Weights & Biases logging
+  wandb_project: rl-smart-grid
+
+# ─────────────────────────────────────────────
+# Reward Shaping Weights
+# ─────────────────────────────────────────────
+reward:
+  alpha: 1.0    # Power loss penalty weight
+  beta: 0.5     # Instability penalty weight
+  gamma: 0.3    # Renewable utilization reward weight
+  delta: 0.8    # Demand satisfaction reward weight
+  collapse_penalty: 10.0  # Grid collapse penalty
+
+# ─────────────────────────────────────────────
+# Double DQN Settings
+# ─────────────────────────────────────────────
+double_dqn:
+  enabled: true
+
+# ─────────────────────────────────────────────
+# Dueling Architecture Settings
+# ─────────────────────────────────────────────
+dueling:
+  enabled: true
+
+# ─────────────────────────────────────────────
+# Prioritized Experience Replay Settings
+# ─────────────────────────────────────────────
+per:
+  enabled: false        # Set to true to enable PER
+  alpha: 0.6            # Priority exponent
+  beta_start: 0.4       # Importance sampling weight start
+  beta_end: 1.0         # Importance sampling weight end
+  epsilon: 1e-6         # Small constant to prevent zero priority
